@@ -46,5 +46,5 @@ class muti_thread_config:
             "elements => elements.map(el => 'https://zujuan.xkw.com' + el.getAttribute('href'))"  # 拼接基础 URL
         )
         if not zujvanwang_questions_urls:
-            raise ValueError("Could not find any question URLs on the catalogue page.")
+            print("Warning: Could not find any question URLs on the catalogue page.")
         return cls(ports, zujvanwang_catalogue_url, zujvanwang_questions_urls)
