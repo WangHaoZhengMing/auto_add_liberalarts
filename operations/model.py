@@ -1,5 +1,7 @@
 from typing import Optional
 
+from operations.connect_browser import connect_to_browser_and_page
+
 class questionData:
     origin: str
     stem: str
@@ -25,3 +27,24 @@ class question_page:
         self.year = year
         self.subject = subject
         self.stemlist = stemlist
+
+class muti_thread_config:
+    ports: list[int]
+    zujvanwang_catalogue_url: str
+    zujvanwang_questions_urls: list[str]
+
+    def __init__(self, ports: list[int], zujvanwang_catalogue_url: str, zujvanwang_questions_urls: Optional[list[str]] = None):
+        self.ports = ports
+        self.zujvanwang_catalogue_url = zujvanwang_catalogue_url
+        self.zujvanwang_questions_urls = zujvanwang_questions_urls if zujvanwang_questions_urls is not None else []
+
+    @classmethod
+    async def create(cls, ports: list[int], zujvanwang_catalogue_url: str):
+        browser, page = await connect_to_browser_and_page(port=2001, target_url=zujvanwang_catalogue_url, target_title="")
+        zujvanwang_questions_urls =  await page.eval_on_selector_all(
+            "ul.exam-list li a",  # 查找 <ul class="exam-list"> 中的 <a> 标签
+            "elements => elements.map(el => 'https://zujuan.xkw.com' + el.getAttribute('href'))"  # 拼接基础 URL
+        )
+        if not zujvanwang_questions_urls:
+            raise ValueError("Could not find any question URLs on the catalogue page.")
+        return cls(ports, zujvanwang_catalogue_url, zujvanwang_questions_urls)

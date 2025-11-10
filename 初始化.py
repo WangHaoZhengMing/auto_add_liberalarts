@@ -1,5 +1,6 @@
 import subprocess
 import os
+from operations.connect_browser import connect_to_browser_and_page
 
 def open_edge_window(port, url, user_data_dir):
     subprocess.Popen([
@@ -16,3 +17,4 @@ base_user_data_dir = r"C:\Users\hallm\AppData\Local\Microsoft\Edge\User Data"
 # 启动多个窗口，使用不同的调试端口和用户数据目录
 open_edge_window(2001, "https://tps-tiku.staff.xdf.cn/tasks/questionSetCreate", os.path.join(base_user_data_dir, "Profile1"))
 open_edge_window(2002, "https://tps-tiku.staff.xdf.cn/tasks/questionSetCreate", os.path.join(base_user_data_dir, "Profile2"))
+

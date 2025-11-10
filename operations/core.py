@@ -15,7 +15,6 @@ async def core(target_url: str,target_title: str,port: int) -> None:
     browser, page = await connect_to_browser_and_page(target_url,target_title=target_title,port=port)
 
     page_data = await download_page(page)
-    
     print(f"Page Name: {page_data.name}")
     print(f"Province: {page_data.province}")
     print(f"Grade: {page_data.grade}")
