@@ -11,7 +11,7 @@ import json
 from typing import Any, Dict, List, Optional
 from playwright.async_api import Response
 
-async def add_question(page_data: question_page,page: Page) -> None:
+async def add_question(page_data: question_page,page: Page,port:int) -> None:
     """Main function to automate paper entry process."""
     target_title: str = "题库平台 | 录排中心"
     
@@ -21,7 +21,7 @@ async def add_question(page_data: question_page,page: Page) -> None:
     logger.info(f"Connecting to browser and navigating to: {target_title}")
     browser: Browser
     page: Page
-    browser, page = await connect_to_browser_and_page(target_url="", target_title=target_title)
+    browser, page = await connect_to_browser_and_page(target_url="", target_title=target_title,port=port)
     logger.info("Successfully connected to browser")
 
     # 监听network数据包 text-search .request method post .get it's data list. and then similar_questions = data list.

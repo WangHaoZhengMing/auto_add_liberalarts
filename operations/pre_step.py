@@ -14,7 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def pre_process(page_data:question_page,page: Page) -> None:
+async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     """Main function to automate paper entry process."""
     # 目标页面URL
     target_url: str = "https://tps-tiku.staff.xdf.cn/tasks/questionSetCreate"
@@ -25,7 +25,7 @@ async def pre_process(page_data:question_page,page: Page) -> None:
     logger.info(f"Connecting to browser and navigating to: {target_url}")
     browser: Browser
     page: Page
-    browser, page = await connect_to_browser_and_page(target_url, target_title="题库平台")
+    browser, page = await connect_to_browser_and_page(target_url, target_title="题库平台", port=port)
     logger.info("Successfully connected to browser")
 
     # 导航到试卷录入页面
