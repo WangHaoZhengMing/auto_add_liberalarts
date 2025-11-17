@@ -77,7 +77,9 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
             logger.info("Pausing for debugging.")
         
         if similar_question_class and 'data' in similar_question_class:
-            datas: List[Dict[str, Any]] = similar_question_class['data']
+            datas: List[Dict[str, Any]] = similar_question_class.get('data')
+            if datas is None:
+                datas = []
             for data_item in datas:
                 source_name = data_item.get('sourceName')
                 if source_name:

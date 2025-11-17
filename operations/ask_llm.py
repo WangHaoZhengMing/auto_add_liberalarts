@@ -3,6 +3,7 @@ import json
 import os
 
 async def ask_llm(page_data):
+    print(f"Starting LLM check for: {page_data.name}")
     """
     Asks an LLM to check for potential errors in question data.
 
@@ -98,3 +99,14 @@ async def ask_llm(page_data):
 
     except Exception as e:
         print(f"An error occurred while communicating with the LLM or saving the file: {e}")
+
+if __name__ == '__main__':
+    import asyncio
+    from types import SimpleNamespace
+
+    # Create a mock page_data object for testing
+    # You can change the 'name' to test with different files.
+    test_page_data = SimpleNamespace(name='2025年上海市莘光学校中考三模英语试题')
+    
+    # Run the async function
+    asyncio.run(ask_llm(test_page_data))

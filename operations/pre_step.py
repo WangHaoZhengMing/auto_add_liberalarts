@@ -58,27 +58,29 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     response = await response_info.value
     await page.wait_for_load_state("networkidle")
     logger.info(f"Upload completed with status: {response.status}")
+    await asyncio.sleep(2)
+
 
     logger.info(f"Entering paper name: {page_data.name}")
     await page.get_by_placeholder("请输入试卷名称", exact=True).fill(page_data.name)
     logger.info("Paper name entered successfully")
-
+    await asyncio.sleep(1)
     # 选择学科
     logger.info("Selecting subject...")
     await page.get_by_title("语文") .click()
     logger.info("Clicked subject dropdown")
-    
+    await asyncio.sleep(1)
     await page.get_by_role("option", name=page_data.subject, exact=True).click()
     logger.info(f"Selected subject: {page_data.subject}")
-
+    await asyncio.sleep(1)
     # 选择试卷类型
     logger.info("Selecting paper type...")
     await page.get_by_placeholder("选择试卷类型").click()
     logger.info("Opened paper type dropdown")
-    
+    await asyncio.sleep(1)
     await page.get_by_text("新东方自研").click()
     logger.info("Selected: 新东方自研")
-    
+    await asyncio.sleep(1)
     await page.get_by_title("教辅", exact=True).click()
     logger.info("Selected: 教辅")
     
@@ -86,7 +88,7 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     logger.info("Selecting institution...")
     await page.get_by_text("选择机构").click()
     logger.info("Opened institution dropdown")
-    
+    await asyncio.sleep(1)
     await page.get_by_role("option", name="集团").click()
     logger.info("Selected institution: 集团")
     

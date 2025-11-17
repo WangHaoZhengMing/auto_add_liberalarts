@@ -1,6 +1,4 @@
 import asyncio
-import aiohttp
-from urllib.parse import quote
 from operations.model import muti_thread_config
 from operations.core import core
 
@@ -10,9 +8,9 @@ async def main() -> None:
     config = await muti_thread_config.create(
         ports=[
             2001, 
-            # 2002,2003,2004,2005,2006,2007,2008,2009
+            2002,2003,2004,2005,2006,2007,2008,2009
             ],
-        zujvanwang_catalogue_url="https://zujuan.xkw.com/czyy/shijuan/bk/a310000")
+        zujvanwang_catalogue_url="https://zujuan.xkw.com/czls/shijuan/bk/t29p6")
 
     
     # 为每个端口和URL创建一个并发任务
