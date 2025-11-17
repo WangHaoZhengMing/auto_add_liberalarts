@@ -79,7 +79,7 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     await page.get_by_text("新东方自研").click()
     logger.info("Selected: 新东方自研")
     
-    await page.get_by_text("教辅", exact=True).click()
+    await page.get_by_title("教辅", exact=True).click()
     logger.info("Selected: 教辅")
     
     # 选择机构

@@ -3,6 +3,7 @@ from asyncio.log import logger
 import os
 from anyio import sleep
 from playwright.async_api import Browser, Page
+from operations import ask_llm
 from operations.add_and_click_tianjia import add_and_click_tianjia
 from operations.connect_browser import connect_to_browser_and_page
 from operations.download_page import question_page
@@ -92,7 +93,7 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
 
 
     # 将 page_data 对象的内容保存为 JSON 文件
-    output_dir = "detail"
+    output_dir = "other/detail"
     os.makedirs(output_dir, exist_ok=True)
     file_path = os.path.join(output_dir, f"{page_data.name}_full.json")
     file_path2 = os.path.join(output_dir, f"{page_data.name}core.json")
@@ -122,6 +123,57 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
         json.dump(core_data, f, ensure_ascii=False, indent=4)
 
     logger.info(f"Successfully saved core data to {file_path2}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     # 保持浏览器打开，便于调试

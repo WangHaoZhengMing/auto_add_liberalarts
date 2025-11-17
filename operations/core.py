@@ -2,8 +2,10 @@ import asyncio
 from operations.pre_step import pre_process
 from operations.add_question import add_question
 from playwright.async_api import Browser, Page
-
+import aiohttp
+from urllib.parse import quote
 from operations.download_page import download_page
+from operations.ask_llm import ask_llm
 
 async def core(target_url: str,target_title: str,port: int) -> None:
 
@@ -22,17 +24,34 @@ async def core(target_url: str,target_title: str,port: int) -> None:
     print(f"Subject: {page_data.subject}")
     print(f"Found {len(page_data.stemlist)} questions.")
 
+    if not await check_paper_exists(target_title):
+        print("Paper does not exist. Proceeding with entry...")
+        await pre_process(page=page,page_data=page_data,port=port)
+        await add_question(page_data, page,port)
+        await ask_llm(page_data)
 
-    await pre_process(page=page,page_data=page_data,port=port)
-    await add_question(page_data, page,port)
-
-
-
-
-    # Keep browser open for debugging
-    await page.pause()
-    await browser.close()
+    else:
+        print("Paper already exists. Skipping entry.")
+        # Keep browser open for debugging
+        await page.pause()
+        await browser.close()
 
 
 if __name__ == "__main__":
     asyncio.run(core())
+
+
+async def check_paper_exists(paper_title: str) -> bool:
+    encoded_paper_name = quote(paper_title)
+    check_url = f"https://tps-tiku-api.staff.xdf.cn/paper/check/paperName?paperName={encoded_paper_name}&operationType=1&paperId="
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(check_url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    print(data)
+                    if data.get("data", {}).get("repeated"):
+                        return True
+        except aiohttp.ClientError as e:
+            print(f"API request failed for '{paper_title}': {e}")
+    return False

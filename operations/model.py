@@ -31,20 +31,20 @@ class question_page:
 class muti_thread_config:
     ports: list[int]
     zujvanwang_catalogue_url: str
-    zujvanwang_questions_urls: list[str]
+    zujvanwang_papers: list[dict[str, str]]
 
-    def __init__(self, ports: list[int], zujvanwang_catalogue_url: str, zujvanwang_questions_urls: Optional[list[str]] = None):
+    def __init__(self, ports: list[int], zujvanwang_catalogue_url: str, zujvanwang_papers: Optional[list[dict[str, str]]] = None):
         self.ports = ports
         self.zujvanwang_catalogue_url = zujvanwang_catalogue_url
-        self.zujvanwang_questions_urls = zujvanwang_questions_urls if zujvanwang_questions_urls is not None else []
+        self.zujvanwang_papers = zujvanwang_papers if zujvanwang_papers is not None else []
 
     @classmethod
     async def create(cls, ports: list[int], zujvanwang_catalogue_url: str):
         browser, page = await connect_to_browser_and_page(port=2001, target_url=zujvanwang_catalogue_url, target_title="")
-        zujvanwang_questions_urls =  await page.eval_on_selector_all(
-            "ul.exam-list div.exam-name-box > a.exam-name",  # 查找包含试卷名称的<a>标签
-            "elements => elements.map(el => 'https://zujuan.xkw.com' + el.getAttribute('href'))"  # 拼接基础 URL
+        zujvanwang_papers = await page.eval_on_selector_all(
+            "ul.exam-list div.exam-name-box > a.exam-name",
+            "elements => elements.map(el => ({url: 'https://zujuan.xkw.com' + el.getAttribute('href'), title: el.getAttribute('title')}))"
         )
-        if not zujvanwang_questions_urls:
+        if not zujvanwang_papers:
             print("Warning: Could not find any question URLs on the catalogue page.")
-        return cls(ports, zujvanwang_catalogue_url, zujvanwang_questions_urls)
+        return cls(ports, zujvanwang_catalogue_url, zujvanwang_papers)
