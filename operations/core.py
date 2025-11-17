@@ -6,6 +6,7 @@ import aiohttp
 from urllib.parse import quote
 from operations.download_page import download_page
 from operations.ask_llm import ask_llm
+import os
 
 async def core(target_url: str,target_title: str,port: int) -> None:
 
@@ -45,9 +46,14 @@ async def check_paper_exists(page: Page, paper_title: str) -> bool:
     encoded_paper_name = quote(paper_title)
     check_url = f"https://tps-tiku-api.staff.xdf.cn/paper/check/paperName?paperName={encoded_paper_name}&operationType=1&paperId="
     try:
-        data = await page.evaluate(f"() => fetch('{check_url}').then(response => response.json())")
+        # Use page's context to make the request, bypassing CORS issues.
+        api_response = await page.context.request.get(check_url)
+        data = await api_response.json()
         print(data)
         if data.get("data", {}).get("repeated"):
+            log_file_path = os.path.join(os.path.dirname(__file__), '..', 'other', '重复.txt')
+            with open(log_file_path, 'a', encoding='utf-8') as f:
+                f.write(paper_title + '\n')
             return True
     except Exception as e:
         print(f"API request failed for '{paper_title}': {e}")
