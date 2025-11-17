@@ -42,7 +42,7 @@ class muti_thread_config:
     async def create(cls, ports: list[int], zujvanwang_catalogue_url: str):
         browser, page = await connect_to_browser_and_page(port=2001, target_url=zujvanwang_catalogue_url, target_title="")
         zujvanwang_questions_urls =  await page.eval_on_selector_all(
-            "ul.exam-list li a",  # 查找 <ul class="exam-list"> 中的 <a> 标签
+            "ul.exam-list div.exam-name-box > a.exam-name",  # 查找包含试卷名称的<a>标签
             "elements => elements.map(el => 'https://zujuan.xkw.com' + el.getAttribute('href'))"  # 拼接基础 URL
         )
         if not zujvanwang_questions_urls:

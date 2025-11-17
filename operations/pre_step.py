@@ -28,10 +28,7 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     browser, page = await connect_to_browser_and_page(target_url, target_title="题库平台", port=port)
     logger.info("Successfully connected to browser")
 
-    # 导航到试卷录入页面
-    logger.info("Navigating to paper entry page...")
-    await page.get_by_text("试卷录入（新）").click()
-    logger.info("Clicked '试卷录入（新）'")
+   
     
     # 新建试卷
     logger.info("Creating new paper...")
