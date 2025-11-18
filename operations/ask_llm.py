@@ -1,7 +1,10 @@
 import json
 import os
+import re
+from typing import Any, Dict, List, Union
+from .send_xchatbot import ask_xchatbot
+import asyncio
 from playwright.async_api import Page
-from send_xchatbot import ask_xchatbot
 
 async def ask_llm(page: Page, page_data):
     print(f"Starting LLM check for: {page_data.name}")
@@ -19,6 +22,7 @@ async def ask_llm(page: Page, page_data):
     try:
         with open(input_file_path, 'r', encoding='utf-8') as f:
             question_data = json.load(f)
+        print(f"Successfully loaded {input_file_path}")
     except FileNotFoundError:
         print(f"Error: Input file not found at {input_file_path}")
         return
@@ -73,18 +77,23 @@ async def ask_llm(page: Page, page_data):
     """
 
     try:
+        print("Sending prompt to LLM...")
         llm_response_str = await ask_xchatbot(page, prompt)
+        print("Received response from LLM.")
         
         # Clean the response string to ensure it's valid JSON
-        # Remove markdown code block fences and strip whitespace
-        if '```json' in llm_response_str:
-            llm_response_str = llm_response_str.split('```json')[1].split('```')[0]
-        
-        llm_response_str = llm_response_str.strip()
+        # Use regex to find the JSON block
+        json_match = re.search(r'```json\s*([\s\S]*?)\s*```', llm_response_str)
+        if json_match:
+            llm_response_str = json_match.group(1)
+        else:
+            # Fallback for cases where the backticks are not present
+            llm_response_str = llm_response_str.strip()
 
         try:
             # The response is a string containing JSON, so we need to parse it.
             llm_response_json = json.loads(llm_response_str)
+            print("Successfully parsed LLM response.")
         except json.JSONDecodeError as e:
             print(f"Failed to decode JSON from LLM response. Error: {e}")
             print(f"LLM response was: {llm_response_str}")

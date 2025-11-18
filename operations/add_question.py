@@ -32,7 +32,7 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
     async def on_response(response: Response) -> None:
         nonlocal similar_questions_json, similar_question_class
         # Log details for all responses to help with debugging
-        logger.info(f"Response URL: {response.url}, Method: {response.request.method}, Status: {response.status}")
+        # logger.info(f"Response URL: {response.url}, Method: {response.request.method}, Status: {response.status}")
         if "text-search" in response.url and response.request.method == "POST":
             try:
                 if response.ok:

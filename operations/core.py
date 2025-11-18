@@ -1,17 +1,17 @@
 import asyncio
-from operations.pre_step import pre_process
-from operations.add_question import add_question
+from .pre_step import pre_process
+from .add_question import add_question
 from playwright.async_api import Browser, Page
 import aiohttp
 from urllib.parse import quote
-from operations.download_page import download_page
-from operations.ask_llm import ask_llm
+from .download_page import download_page
+from .ask_llm import ask_llm
 import os
 
 async def core(target_url: str,target_title: str,port: int) -> None:
 
     # 目标页面URL
-    from operations.connect_browser import connect_to_browser_and_page
+    from .connect_browser import connect_to_browser_and_page
     # 连接到浏览器并获取页面
     browser: Browser
     page: Page
