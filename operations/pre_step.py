@@ -51,7 +51,7 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     logger.info(f"Selecting file: {file_path}")
     
     async with page.expect_response(
-        lambda response: "upload" in response.url or response.url.endswith(".pdf")
+        lambda response: "upload" in response.url or response.url.endswith(".pdf"), timeout=240000
     ) as response_info:
         await file_chooser.set_files(file_path)
     

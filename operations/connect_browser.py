@@ -47,7 +47,7 @@ async def connect_to_browser_and_page(target_url: str,target_title: str, port: i
         print("未找到指定页面，将创建新页面...")
         page = await context.new_page()
         if target_url:
-            await page.goto(target_url,wait_until="domcontentloaded")
+            await page.goto(target_url,wait_until="domcontentloaded",timeout=120000)
             print(f"已在新页面中打开URL: {target_url}")
         else:
             print("未提供目标URL，打开空白页面。")

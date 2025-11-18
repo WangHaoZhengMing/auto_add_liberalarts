@@ -3,7 +3,7 @@ from asyncio.log import logger
 import os
 from anyio import sleep
 from playwright.async_api import Browser, Page
-from operations import ask_llm
+from operations.ask_llm import ask_llm
 from operations.add_and_click_tianjia import add_and_click_tianjia
 from operations.connect_browser import connect_to_browser_and_page
 from operations.download_page import question_page
@@ -125,9 +125,10 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
         json.dump(core_data, f, ensure_ascii=False, indent=4)
 
     logger.info(f"Successfully saved core data to {file_path2}")
+    
+    logger.info("Starting LLM analysis of question data...")
 
-
-
+    await ask_llm(page,page_data)
 
 
 

@@ -1,17 +1,19 @@
+import openai
 import json
 import os
-from playwright.async_api import Page
-from send_xchatbot import ask_xchatbot
 
-async def ask_llm(page: Page, page_data):
+async def ask_llm(page_data):
     print(f"Starting LLM check for: {page_data.name}")
     """
-    Asks an LLM to check for potential errors in question data using xchatbot.
+    Asks an LLM to check for potential errors in question data.
 
     Args:
-        page: The Playwright page object.
         page_data: An object containing the name of the page data.
     """
+    client = openai.AsyncOpenAI(
+        base_url="https://api.tu-zi.com/v1",
+        api_key="sk-AkHdmPIjUo7YJ6FgWzDyKLiT9AQotOugJ4JzZ5iQe73b1pAZ",
+    )
 
     input_file_path = os.path.join('operations', '..', 'other', 'detail', f'{page_data.name}_full.json')
     output_file_path = os.path.join('operations', '..', 'other', 'LLM_output', f'{page_data.name}_llm_check.json')
@@ -73,7 +75,17 @@ async def ask_llm(page: Page, page_data):
     """
 
     try:
-        llm_response_str = await ask_xchatbot(page, prompt)
+        chat_completion = await client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model="gemini-2.5-pro",
+        )
+
+        llm_response_str = chat_completion.choices[0].message.content
         
         # Clean the response string to ensure it's valid JSON
         # Remove markdown code block fences and strip whitespace
@@ -102,23 +114,10 @@ async def ask_llm(page: Page, page_data):
 if __name__ == '__main__':
     import asyncio
     from types import SimpleNamespace
-    from playwright.async_api import async_playwright
-    from connect_browser import connect_to_browser_and_page
 
-    async def run_test():
-        async with async_playwright() as p:
-            port = 2001
-            target_url = ""
-            target_title = "小智GPT"
-            browser, page = await connect_to_browser_and_page(target_url,target_title=target_title,port=port)
-            
-            # Create a mock page_data object for testing
-            # You can change the 'name' to test with different files.
-            test_page_data = SimpleNamespace(name='2025年上海市莘光学校中考三模英语试题')
-            
-            await ask_llm(page, test_page_data)
-            
-            await browser.close()
-
+    # Create a mock page_data object for testing
+    # You can change the 'name' to test with different files.
+    test_page_data = SimpleNamespace(name='2025年上海市莘光学校中考三模英语试题')
+    
     # Run the async function
-    asyncio.run(run_test())
+    asyncio.run(ask_llm(test_page_data))

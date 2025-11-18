@@ -8,9 +8,9 @@ async def main() -> None:
     config = await muti_thread_config.create(
         ports=[
             2001, 
-            2002,2003,2004,2005,2006,2007,2008,2009
+            # 2002,2003,2004,2005,2006,2007,2008,2009,2010
             ],
-        zujvanwang_catalogue_url="https://zujuan.xkw.com/czls/shijuan/bk/t29p6")
+        zujvanwang_catalogue_url="https://zujuan.xkw.com/czkx/shijuan/bk/t29p4")
 
     
     # 为每个端口和URL创建一个并发任务
@@ -18,6 +18,7 @@ async def main() -> None:
     
     valid_papers = [paper for paper in config.zujvanwang_papers if paper.get('url') and paper.get('url').startswith("http")]
     
+    valid_papers = valid_papers[2:3]  # Only for test
 
     # Use the minimum of the number of ports and the number of valid URLs found
     num_tasks = min(len(config.ports), len(valid_papers))
