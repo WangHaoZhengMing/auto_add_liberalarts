@@ -17,7 +17,7 @@ async def connect_to_browser_and_page(target_url: str,target_title: str, port: i
     Raises:
         RuntimeError: 如果未找到指定URL的页面
     """
-    print(f"连接到题库平台调试界面 (端口: {port})...")
+    print(f"连接到调试界面 (端口: {port})...")
     
     p = await async_playwright().start()
     

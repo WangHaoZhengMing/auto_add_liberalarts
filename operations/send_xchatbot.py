@@ -1,7 +1,17 @@
 import json
-from playwright.async_api import Page
+import asyncio
+from playwright.async_api import Browser, Page
+from playwright.async_api import async_playwright
+from .connect_browser import connect_to_browser_and_page
 
 async def ask_xchatbot(page: Page, message: str) -> str:
+    port = 2001
+    target_url = ""
+    target_title = "小智GPT"
+    # 连接到浏览器并获取页面
+    browser: Browser
+    page: Page
+    browser, page = await connect_to_browser_and_page(target_url,target_title=target_title,port=port)
     """
     Sends a message to the xchatbot and returns the response text.
 
@@ -55,7 +65,7 @@ async def ask_xchatbot(page: Page, message: str) -> str:
     
     if last_json and 'content' in last_json:
         last_json['content']['text'] = full_text
-
+    print("Final assembled response:", full_text)
     return full_text
 
 if __name__ == "__main__":
@@ -806,6 +816,7 @@ if __name__ == "__main__":
                                           
                                           """)
             print(response)
+            print("========================================")
             await browser.close()
 
     asyncio.run(main())

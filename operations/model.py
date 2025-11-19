@@ -42,9 +42,15 @@ class muti_thread_config:
     async def create(cls, ports: list[int], zujvanwang_catalogue_url: str):
         browser, page = await connect_to_browser_and_page(port=2001, target_url=zujvanwang_catalogue_url, target_title="")
         zujvanwang_papers = await page.eval_on_selector_all(
-            "ul.exam-list div.exam-name-box > a.exam-name",
-            "elements => elements.map(el => ({url: 'https://zujuan.xkw.com' + el.getAttribute('href'), title: el.getAttribute('title')}))"
+            "ul.paper-list div.paper-title > a.link-txt",
+            "elements => elements.map(el => ({url: 'https://zujuan.xkw.com' + el.getAttribute('href'), title: el.innerText.trim()}))"
         )
         if not zujvanwang_papers:
             print("Warning: Could not find any question URLs on the catalogue page.")
         return cls(ports, zujvanwang_catalogue_url, zujvanwang_papers)
+    
+
+provinces: dict[str, list[str]] = {
+    "北京": ["北京市"],
+    "浙江": ["台州市", "金华市", "嘉兴市", "杭州市", "衢州市", "湖州市", "宁波市", "丽水市", "舟山市", "绍兴市", "温州市"],
+}

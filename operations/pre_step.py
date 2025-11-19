@@ -1,9 +1,10 @@
 import asyncio
 import logging
 from playwright.async_api import Browser, Page
-from operations.connect_browser import connect_to_browser_and_page
-from operations.download_page import question_page
-from operations.model import question_page, questionData
+from .connect_browser import connect_to_browser_and_page
+from .download_page import question_page
+from .model import question_page, questionData, provinces
+from .send_xchatbot import ask_xchatbot
 
 # Configure logging
 logging.basicConfig(
@@ -108,19 +109,40 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     await page.get_by_role("option", name=page_data.grade, exact=True).click()
     logger.info(f"Selected grade: {page_data.grade}")
 
-    # 加入省份
-    # logger.info("Selecting province...")
-    # try:
-    #     await page.get_by_text("添加省").click()
-    #     await page.get_by_text(page_data.province).click()
-    #     await page.get_by_text("确认").click()
-    # except Exception as e:
-    #     logger.error(f"Error selecting province: {e}")
-    # 保持浏览器打开，便于调试
-    await page.get_by_text("去录排").click()
+    # 加入市
+    logger.info("Selecting province...")
+    city = await get_city_from_llm(page_data.name,page=page)
+    browser, page = await connect_to_browser_and_page(target_url, target_title="题库平台", port=port)
+    if not city == "":
+        try:
+            await page.get_by_text("添加市").click()
+            await page.get_by_text("全国",exact=True).click()
+            await page.get_by_text(f"{page_data.province}省",exact=True).click()
+            await asyncio.sleep(0.5)
+            await page.get_by_text(f"{city.strip("'\"")}",exact=True).first.click()
+            await page.get_by_role("button", name="确 认").click()
+            
+        except Exception as e:
+            logger.error(f"Error selecting province: {e}")
+        # 保持浏览器打开，便于调试
+        await page.get_by_text("去录排").click()
+    else:
+        try:
+            await page.get_by_text("添加省").click()
+            await page.get_by_text(f"{page_data.province}",exact=True).click()
+            await page.get_by_role("button", name="确 认").click()
+            
+        except Exception as e:
+            logger.error(f"Error selecting province: {e}")
+        # 保持浏览器打开，便于调试
+        await page.get_by_text("去录排").click()
     await browser.close()
     logger.info("Browser closed")
 
 
 if __name__ == "__main__":
     asyncio.run(pre_process())
+
+
+async def get_city_from_llm(paper_name: str,page:Page) -> str:
+    return await ask_xchatbot(page=page,message=f"请从试卷名称中提取出城市名称，只需要返回城市名称，格式为'城市'，如果没有包含省份和城市信息，请返回''。试卷名称：{paper_name}.only can be one of the following cities list:{provinces.get("浙江")}.if it is not in the list,return ''.")
