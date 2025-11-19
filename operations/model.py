@@ -27,7 +27,6 @@ class question_page:
         self.year = year
         self.subject = subject
         self.stemlist = stemlist
-
 class muti_thread_config:
     ports: list[int]
     zujvanwang_catalogue_url: str

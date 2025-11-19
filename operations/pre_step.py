@@ -97,11 +97,11 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     logger.info("Selecting paper year...")
     await page.get_by_text("选择试卷年份").click()
     logger.info("Opened year dropdown")
-
+ 
     await page.get_by_text(str(page_data.year), exact=True).click()
     logger.info(f"Selected year: {page_data.year}")
 
-
+    
     # 选择年级
     logger.info("Selecting grade...")
     await page.get_by_text("选择年级").click()
