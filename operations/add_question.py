@@ -65,12 +65,12 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
             async with page.expect_response(lambda response: "text-search" in response.url and response.request.method == "POST", timeout=30000) as response_info:
                 await page.get_by_role("button", name="search").click()
                 response_value: Response = await response_info.value
-                await sleep(0.5)
+                await sleep(1)
                 logger.info(f"Search response received. Status: {response_value.status}")
 
             # After the response is received, the on_response handler has already processed it.
             # Give a moment for the UI to update.
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(10000)
 
         except Exception as e:
             logger.error(f"Did not receive search response or an error occurred: {e}")
@@ -90,7 +90,7 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
                     
         else:
             logger.warning("Could not find 'data' in the response or the response was not captured.")
-
+        # await sleep(0.6)
         await add_and_click_tianjia(page)
 
 

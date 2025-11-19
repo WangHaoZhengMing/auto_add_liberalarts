@@ -100,6 +100,14 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     await page.get_by_text(str(page_data.year), exact=True).click()
     logger.info(f"Selected year: {page_data.year}")
 
+
+    # 选择年级
+    logger.info("Selecting grade...")
+    await page.get_by_text("选择年级").click()
+    logger.info("Opened grade dropdown")
+    await page.get_by_role("option", name=page_data.grade, exact=True).click()
+    logger.info(f"Selected grade: {page_data.grade}")
+
     # 加入省份
     # logger.info("Selecting province...")
     # try:

@@ -10,7 +10,7 @@ async def main() -> None:
             2001, 
             2002,2003,2004,2005,2006,2007,2008,2009,2010
             ],
-        zujvanwang_catalogue_url="https://zujuan.xkw.com/czkx/shijuan/bk/a330100p2")
+        zujvanwang_catalogue_url="https://zujuan.xkw.com/czkx/topschool/a330000p1")
 
     
     # 为每个端口和URL创建一个并发任务
