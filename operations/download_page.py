@@ -98,6 +98,8 @@ async def download_page(playwright_page: PlaywrightPage) -> question_page:
     # in there save the All.sec-list to pdf named title.pdf
     await playwright_page.pdf(path=f"./PDF/{title}.pdf")
     print(f"Saved PDF: ./PDF/{title}.pdf")
+
+    PlaywrightPage.close()
     
     return page_data
 

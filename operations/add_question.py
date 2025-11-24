@@ -128,8 +128,8 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
     
     logger.info("Starting LLM analysis of question data...")
 
-    await ask_llm(page,page_data)
-
+    # await ask_llm(page,page_data)
+    await page.get_by_text("提 交",exact=True).click()
 
 
 

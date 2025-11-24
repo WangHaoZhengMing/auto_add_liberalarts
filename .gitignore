@@ -6,6 +6,10 @@ dist/
 wheels/
 *.egg-info
 PDF/
-other
+other/__pycache__
+other/detail
+other/LLM_output
+other/重复.txt
+other/doc/*.pdf
 # Virtual environments
 .venv
