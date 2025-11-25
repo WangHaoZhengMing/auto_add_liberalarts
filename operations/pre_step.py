@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from playwright.async_api import Browser, Page
 from .connect_browser import connect_to_browser_and_page
 from .download_page import question_page
@@ -29,8 +30,8 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     browser, page = await connect_to_browser_and_page(target_url, target_title="题库平台", port=port)
     logger.info("Successfully connected to browser")
 
-    # await page.reload()
-    # await asyncio.sleep(1)
+    await page.reload()
+    await asyncio.sleep(1)
     
     # 新建试卷
     logger.info("Creating new paper...")
@@ -43,24 +44,8 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     logger.info("Clicked '手工录入'")
 
 
-    # 上传文件
     logger.info("Uploading PDF file...")
-    async with page.expect_file_chooser() as fc_info:
-        await page.locator("span.ant-upload").click()
-    file_chooser = await fc_info.value
-    partial_path:str = page_data.name
-    file_path = f"PDF/{partial_path}.pdf"
-    logger.info(f"Selecting file: {file_path}")
-    
-    async with page.expect_response(
-        lambda response: "upload" in response.url or response.url.endswith(".pdf"), timeout=240000
-    ) as response_info:
-        await file_chooser.set_files(file_path)
-    
-    response = await response_info.value
-    await page.wait_for_load_state("networkidle")
-    logger.info(f"Upload completed with status: {response.status}")
-    await asyncio.sleep(2)
+    await upload_pdf(page, page_data)
 
 
     logger.info(f"Entering paper name: {page_data.name}")
@@ -147,3 +132,28 @@ if __name__ == "__main__":
 
 async def get_city_from_llm(paper_name: str,page:Page) -> str:
     return await ask_xchatbot(page=page,message=f"请从试卷名称中提取出城市名称，只需要返回城市名称，格式为'城市'，如果没有包含省份和城市信息，请返回''。试卷名称：{paper_name}.only can be one of the following cities list:{provinces.get("浙江")}.if it is not in the list,return ''.")
+
+
+async def upload_pdf(page, page_data):
+    logger.info("Uploading PDF file...")
+
+    # 构造绝对路径
+    partial_path = page_data.name
+    file_path = os.path.abspath(f"PDF/{partial_path}.pdf")
+    logger.info(f"Selecting file: {file_path}")
+
+    # 直接设置隐藏的 input[type=file]，避免点击事件超时
+    await page.set_input_files("input[type=file]", file_path)
+
+    # 验证上传是否成功：通常上传后文件名会显示在页面上
+    file_name = f"{partial_path}.pdf"
+    try:
+        logger.info(f"Verifying upload for {file_name}...")
+        # 等待文件名出现，超时时间设置为 5 秒
+        await page.wait_for_selector(f"text={file_name}", timeout=5000)
+        logger.info(f"Upload successful: {file_name} detected on page.")
+    except Exception as e:
+        logger.warning(f"Could not verify upload for {file_name}. It might have failed or the UI is different. Error: {e}")
+
+    # 等待页面处理完成
+    await asyncio.sleep(2)
