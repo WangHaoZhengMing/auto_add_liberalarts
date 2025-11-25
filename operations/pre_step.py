@@ -29,7 +29,8 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
     browser, page = await connect_to_browser_and_page(target_url, target_title="题库平台", port=port)
     logger.info("Successfully connected to browser")
 
-   
+    # await page.reload()
+    # await asyncio.sleep(1)
     
     # 新建试卷
     logger.info("Creating new paper...")

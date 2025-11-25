@@ -99,7 +99,7 @@ async def download_page(playwright_page: PlaywrightPage) -> question_page:
     await playwright_page.pdf(path=f"./PDF/{title}.pdf")
     print(f"Saved PDF: ./PDF/{title}.pdf")
 
-    PlaywrightPage.close()
+    await playwright_page.close()
     
     return page_data
 

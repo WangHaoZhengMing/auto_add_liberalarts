@@ -46,6 +46,8 @@ class muti_thread_config:
         )
         if not zujvanwang_papers:
             print("Warning: Could not find any question URLs on the catalogue page.")
+        print("close tabpage")
+        # await page.close()
         return cls(ports, zujvanwang_catalogue_url, zujvanwang_papers)
     
 
