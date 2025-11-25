@@ -1,0 +1,61 @@
+import { StandardTableView, VerticalBox, ScrollView, TextEdit } from "std-widgets.slint";
+
+export struct ErrorItem {
+    origin: string,
+    stem-preview: string,
+    reason: string,
+}
+
+export component ErrorViewer inherits Window {
+    default-font-family: "Microsoft YaHei";
+    preferred-width: 1200px;
+    preferred-height: 800px;
+    
+    in property <[ErrorItem]> error-items: [];
+    property <int> selected-row: -1;
+    
+    HorizontalLayout {
+        // Left side: Table of errors
+        table := StandardTableView {
+            width: 60%;
+            columns: [
+                { title: "试卷", width: 200px },
+                { title: "reason_for_error", width: 300px },
+            ];
+            rows: [
+                // Populated from Python
+            ];
+        }
+        
+        // Right side: Detail view
+        VerticalBox {
+            width: 40%;
+            padding: 10px;
+            
+            Text {
+                text: "详细信息";
+                font-size: 18px;
+                font-weight: 700;
+            }
+            
+            ScrollView {
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text { text: "完整题干:"; font-weight: 600; }
+                    TextEdit { 
+                        read-only: true;
+                        wrap: word-wrap;
+                        // Bind to selected item's stem
+                    }
+                    
+                    Text { text: "题库中的题干:"; font-weight: 600; }
+                    TextEdit { 
+                        read-only: true;
+                        wrap: word-wrap;
+                    }
+                }
+            }
+        }
+    }
+}

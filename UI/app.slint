@@ -1,0 +1,244 @@
+import {
+    Button,
+    VerticalBox,
+    LineEdit,
+    GroupBox,
+    ScrollView,
+    HorizontalBox,
+    ProgressIndicator,
+    TabWidget,
+    CheckBox,
+    ComboBox,
+    SpinBox,
+} from "std-widgets.slint";
+
+export struct QuestionItem {
+    paper_name: string,
+    stem: string,
+    zujvan_origin: string,
+    ourbank_origin: string,
+}
+
+export component AppWindow inherits Window {
+    title: "ExamBridge - 文科试题自动化工具";
+    min-width: 700px;
+    min-height: 700px;
+    background: #f5f5f5;
+    default-font-family: "Microsoft YaHei";
+    
+    in-out property <string> catalogue-url: "https://zujuan.xkw.com/czkx/topschool/a330000p51";
+    in-out property <string> ports-string: "2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010";
+    in-out property <bool> is-processing: false;
+    in-out property <float> overall-progress: 0.0;
+    in-out property <string> log-text: "";
+    
+    in-out property <[QuestionItem]> questions: [
+        {paper_name: "示例试卷1", stem: "2024年浙江省中考模拟科学试题", zujvan_origin: "", ourbank_origin: "" },
+        {paper_name: "示例试卷2", stem: "2024年温州市第八中学九年级期中", zujvan_origin: "", ourbank_origin: "" },
+        {paper_name: "示例试卷3", stem: "2023年杭州市采荷中学竞赛题", zujvan_origin: "组卷网", ourbank_origin: "题库" },
+    ];
+    
+    callback start-process();
+    callback stop-process();
+    callback clear-log();
+    
+    TabWidget {
+        Tab {
+            title: "主要功能";
+            VerticalBox {
+                padding: 15px;
+                spacing: 15px;
+                
+                // 配置区域
+                GroupBox {
+                    title: "配置设置";
+                    vertical-stretch: 0;
+                    VerticalBox {
+                        spacing: 10px;
+                        
+                        HorizontalBox {
+                            spacing: 10px;
+                            VerticalBox {
+                                width: 60%;
+                                Text {
+                                    text: "目录URL:";
+                                    font-weight: 600;
+                                }
+                                LineEdit {
+                                    text <=> root.catalogue-url;
+                                    placeholder-text: "请输入组卷网目录URL";
+                                }
+                            }
+                        }
+                        VerticalBox {
+                            Text {
+                                text: "端口配置 (逗号分隔):";
+                                font-weight: 600;
+                            }
+                            LineEdit {
+                                text <=> root.ports-string;
+                                placeholder-text: "例如: 2001, 2002, 2003, 2004, 2005";
+                            }
+                        }
+                    }
+                }
+                
+                // 控制按钮和进度
+                GroupBox {
+                    title: "控制面板";
+                    vertical-stretch: 0;
+                    VerticalBox {
+                        spacing: 10px;
+                        
+                        HorizontalBox {
+                            spacing: 10px;
+                            alignment: start;
+                            
+                            Button {
+                                text: root.is-processing ? "停止处理" : "开始处理";
+                                primary: !root.is-processing;
+                                enabled: !root.is-processing || root.is-processing;
+                                clicked => {
+                                    if (root.is-processing) {
+                                        root.stop-process();
+                                    } else {
+                                        root.start-process();
+                                    }
+                                }
+                            }
+                            
+                            Button {
+                                text: "清空日志";
+                                clicked => {
+                                    root.clear-log();
+                                }
+                            }
+                            
+                            Rectangle {
+                                width: 20px;
+                            }
+                            
+                            if root.is-processing : VerticalBox {
+                                alignment: center;
+                                Text {
+                                    text: "整体进度:";
+                                    font-size: 12px;
+                                }
+                                ProgressIndicator {
+                                    progress: root.overall-progress;
+                                    width: 200px;
+                                }
+                                Text {
+                                    text: Math.round(root.overall-progress * 100) + "%";
+                                    font-size: 12px;
+                                    horizontal-alignment: center;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 处理状态表格
+                GroupBox {
+                    title: "处理状态";
+                    vertical-stretch: 1;
+                    
+                    VerticalBox {
+                        // 表头
+                        Rectangle {
+                            height: 35px;
+                            background: #e8e8e8;
+                            border-radius: 5px;
+                            HorizontalBox {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                alignment: center;
+                                
+                                Text {
+                                    text: "试卷名称";
+                                    width: 15%;
+                                    font-weight: 700;
+                                    color: #333;
+                                }
+                                Text {
+                                    text: "题目内容";
+                                    width: 35%;
+                                    font-weight: 700;
+                                    color: #333;
+                                }
+                                Text {
+                                    text: "来源信息";
+                                    width: 20%;
+                                    font-weight: 700;
+                                    color: #333;
+                                }
+                            }
+                        }
+
+                        ScrollView {
+                            VerticalBox {
+                                alignment: start;
+                                for item[index] in root.questions : Rectangle {
+                                    height: 50px;
+                                    background: mod(index, 2) == 0 ? #ffffff : #f8f8f8;
+                                    border-radius: 3px;
+                                    
+                                    HorizontalBox {
+                                        padding-left: 10px;
+                                        padding-right: 10px;
+                                        alignment: center;
+                                        
+                                        Text {
+                                            text: item.paper_name;
+                                            width: 15%;
+                                            overflow: elide;
+                                            vertical-alignment: center;
+                                            font-size: 12px;
+                                        }
+                                        
+                                        Text {
+                                            text: item.stem;
+                                            width: 35%;
+                                            overflow: elide;
+                                            vertical-alignment: center;
+                                            font-size: 12px;
+                                        }
+                                        VerticalBox {
+                                            width: 20%;
+                                            alignment: center;
+                                            Text {
+                                                text: item.zujvan_origin != "" ? "组卷网 → 题库" : "";
+                                                vertical-alignment: center;
+                                                font-size: 11px;
+                                                color: #666;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        Tab {
+            title: "日志";
+            VerticalBox {
+                padding: 15px;
+                GroupBox {
+                    title: "运行日志";
+                    ScrollView {
+                        Text {
+                            text: root.log-text;
+                            wrap: word-wrap;
+                            font-family: "Consolas, Monaco, monospace";
+                            font-size: 11px;
+                            color: #333;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

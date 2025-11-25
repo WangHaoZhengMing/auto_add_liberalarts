@@ -84,8 +84,13 @@ async def download_page(playwright_page: PlaywrightPage) -> question_page:
             subject = s
             break
 
-    year_match = re.search(r'\d{4}', title)
-    year = int(year_match.group(0)) if year_match else 2024
+    year_matches = re.findall(r'\d{4}', title)
+    year = 2024  # 默认年份
+    for year_str in year_matches:
+        year_int = int(year_str)
+        if 2001 <= year_int <= 2030:
+            year = year_int
+            break
 
     page_data = question_page(
         name=title,
