@@ -112,6 +112,13 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
             logger.error(f"Error selecting province: {e}")
         # 保持浏览器打开，便于调试
         await page.get_by_text("去录排").click()
+        
+        element = await page.query_selector("text=请上传原卷")
+        if element:
+            print("upload failed")
+            await upload_pdf(page, page_data)
+        else:
+            print("没找到提示元素")
     else:
         try:
             await page.get_by_text("添加省").click()

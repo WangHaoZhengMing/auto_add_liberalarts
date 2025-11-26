@@ -6,7 +6,7 @@ from .send_xchatbot import ask_xchatbot
 import asyncio
 from playwright.async_api import Page
 
-async def ask_llm(page: Page, page_data):
+async def ask_llm_for_accuracy(page: Page, page_data) -> Dict[str, Any]:
     print(f"Starting LLM check for: {page_data.name}")
     """
     Asks an LLM to check for potential errors in question data using xchatbot.
@@ -14,6 +14,9 @@ async def ask_llm(page: Page, page_data):
     Args:
         page: The Playwright page object.
         page_data: An object containing the name of the page data.
+    
+    Returns:
+        Dict[str, Any]: The parsed JSON response from the LLM containing potential errors.
     """
 
     input_file_path = os.path.join('operations', '..', 'other', 'detail', f'{page_data.name}_full.json')
@@ -56,7 +59,7 @@ async def ask_llm(page: Page, page_data):
                         ["福建平潭一中教研片2024-2025学年九年级上学期英语期中适应性练习"],
                         ["2018年江苏省徐州市四县二区中考一模英语试题"]
                     ],
-                    "reason_for_error": "您标记的来源是 '2025·上海闵行·三模'，但系统题库数据 'origin_from_our_bank' 中并未包含 '2025年上海市莘光学校中考三模英语试题'。这表明该题可能是一道旧题，被错误地标记为了新题。"
+                    "reason_for_error": "您标记的来源'2025·上海闵行·三模'与系统题库中的任何来源都不匹配。预期应找到'2025年上海市莘光学校中考三模英语试题'或类似来源,但'origin_from_our_bank'中的所有来源均不符合此标准。"
                 }},
                 {{
                     "origin": "2025·上海闵行·三模",
@@ -66,7 +69,7 @@ async def ask_llm(page: Page, page_data):
                         ["2015届辽宁大石桥市水源二中中考模拟英语试卷"],
                         ["【万唯原创】2015年安徽省面对面英语（人教新目标Go For It）八年级(下)限时练"]
                     ],
-                    "reason_for_error": "您标记的来源是 '2025·上海闵行·三模'，但系统题库数据 'origin_from_our_bank' 中并未包含 '2025年上海市莘光学校中考三模英语试题'。这表明该题可能是一道旧题，被错误地标记为了新题。"
+                    "reason_for_error": "您标记的来源'2025·上海闵行·三模'与系统题库中的任何来源都不匹配。预期应找到'2025年上海市莘光学校中考三模英语试题'或类似来源,但'origin_from_our_bank'中的所有来源均不符合此标准。"
                 }}
             ]
         }}
@@ -104,7 +107,7 @@ async def ask_llm(page: Page, page_data):
             json.dump(llm_response_json, f, ensure_ascii=False, indent=4)
         
         print(f"Successfully saved LLM check to {output_file_path}")
-
+        return llm_response_json
     except Exception as e:
         print(f"An error occurred while communicating with the LLM or saving the file: {e}")
 
@@ -125,7 +128,7 @@ if __name__ == '__main__':
             # You can change the 'name' to test with different files.
             test_page_data = SimpleNamespace(name='2025年上海市莘光学校中考三模英语试题')
             
-            await ask_llm(page, test_page_data)
+            await ask_llm_for_accuracy(page, test_page_data)
             
             await browser.close()
 

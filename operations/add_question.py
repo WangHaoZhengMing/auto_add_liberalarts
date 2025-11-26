@@ -3,7 +3,7 @@ from asyncio.log import logger
 import os
 from anyio import sleep
 from playwright.async_api import Browser, Page
-from operations.ask_llm import ask_llm
+from operations.ask_llm import ask_llm_for_accuracy
 from operations.add_and_click_tianjia import add_and_click_tianjia
 from operations.connect_browser import connect_to_browser_and_page
 from operations.download_page import question_page
@@ -65,7 +65,6 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
             async with page.expect_response(lambda response: "text-search" in response.url and response.request.method == "POST", timeout=30000) as response_info:
                 await page.get_by_role("button", name="search").click()
                 response_value: Response = await response_info.value
-                await sleep(1)
                 logger.info(f"Search response received. Status: {response_value.status}")
 
             # After the response is received, the on_response handler has already processed it.
@@ -90,7 +89,6 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
                     
         else:
             logger.warning("Could not find 'data' in the response or the response was not captured.")
-        # await sleep(0.6)
         await add_and_click_tianjia(page)
 
 
@@ -128,7 +126,7 @@ async def add_question(page_data: question_page,page: Page,port:int) -> None:
     
     logger.info("Starting LLM analysis of question data...")
 
-    # await ask_llm(page,page_data)
+    # await ask_llm_for_accuracy(page,page_data)
     await page.get_by_text("提 交",exact=True).click()
 
 
