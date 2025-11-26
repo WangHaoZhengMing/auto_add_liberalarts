@@ -117,6 +117,7 @@ async def pre_process(page_data:question_page,page: Page,port:int) -> None:
         if element:
             print("upload failed")
             await upload_pdf(page, page_data)
+            await page.get_by_text("去录排").click()
         else:
             print("没找到提示元素")
     else:
